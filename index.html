@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Giới thiệu bản thân | Trang cá nhân</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f8 100%);
+            color: #1e293b;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+        }
+
+        /* container chính - tạo hiệu ứng "trình duyệt" nhẹ nhàng */
+        .browser-card {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(0px);
+        }
+
+        /* thanh giả lập trình duyệt (fun little detail) */
+        .browser-bar {
+            background: #f1f3f7;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            transition: 0.1s;
+        }
+
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+
+        .url-bar {
+            background: white;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            flex: 1;
+            font-size: 0.85rem;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .url-bar i {
+            color: #5b6e8c;
+            font-size: 0.75rem;
+        }
+
+        .url-text {
+            white-space: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        /* nội dung chính */
+        .profile-container {
+            padding: 2rem 2rem 2.5rem 2rem;
+        }
+
+        /* header avatar + tên */
+        .hero-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+            border: 1px solid rgba(203,213,225,0.4);
+        }
+
+        .avatar-wrapper {
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(135deg, #0f2b3d, #1b4a6e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 25px -8px rgba(0,0,0,0.2);
+            border: 4px solid white;
+        }
+
+        .avatar i {
+            font-size: 4.2rem;
+            color: white;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+        }
+
+        .intro-text h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #1e293b, #2c3e66);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .intro-text .tagline {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #2c6e9e;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #eef2ff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .description {
+            margin-top: 1rem;
+            color: #334155;
+            max-width: 550px;
+        }
+
+        /* thông tin chi tiết dạng grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin: 2.5rem 0 2rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 1.4rem 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            border: 1px solid #e9eef3;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 30px -10px rgba(0,0,0,0.1);
+            border-color: #cbdff2;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #0f2b3d;
+            border-left: 4px solid #3b82f6;
+            padding-left: 0.75rem;
+        }
+
+        .card-title i {
+            color: #3b82f6;
+            font-size: 1.3rem;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-tag {
+            background: #eef2ff;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e40af;
+        }
+
+        .hobby-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .hobby-item i {
+            width: 28px;
+            color: #3b82f6;
+            font-size: 1.2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .contact-item i {
+            width: 28px;
+            font-size: 1.2rem;
+            color: #2c6e9e;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #1e293b;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .social-link:hover {
+            background: #e2e8f0;
+            transform: scale(0.97);
+            color: #0f3b5c;
+        }
+
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #5b6e8c;
+            border-top: 1px solid #e2edf7;
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .quote {
+            font-style: italic;
+            background: #f8fafc;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            margin-top: 0.5rem;
+            border-left: 3px solid #3b82f6;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 1rem;
+            }
+            .profile-container {
+                padding: 1.2rem;
+            }
+            .hero-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            .intro-text .tagline {
+                justify-content: center;
+            }
+            .avatar {
+                width: 110px;
+                height: 110px;
+            }
+            .avatar i {
+                font-size: 3.2rem;
+            }
+            .card-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        button, a {
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="browser-card">
+    <!-- thanh giả lập trình duyệt (tạo cảm giác "trình duyệt cá nhân") -->
+    <div class="browser-bar">
+        <div class="browser-dots">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+        </div>
+        <div class="url-bar">
+            <i class="fas fa-lock"></i>
+            <span class="url-text">https://about.me/</span><span style="color:#2563eb; font-weight:500;">duyencv</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 10px;"></i>
+        </div>
+        <div style="display: flex; gap: 6px;">
+            <i class="fas fa-ellipsis-h" style="color:#7e8b9e;"></i>
+        </div>
+    </div>
+
+    <!-- Nội dung giới thiệu bản thân -->
+    <div class="profile-container">
+        <div class="hero-section">
+            <div class="avatar-wrapper">
+                <div class="avatar">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+            </div>
+            <div class="intro-text">
+                <h1>Ngọc Sinh Nguyễn</h1>
+                <div class="tagline">
+                    <span><i class="fas fa-code"></i> Lập trình viên Front-end & UI Enthusiast</span>
+                    <span class="badge"><i class="fas fa-map-marker-alt"></i> Hà Nội, Việt Nam</span>
+                </div>
+                <div class="description">
+                    Xin chào! Tôi là một nhà phát triển web đam mê sáng tạo, thích xây dựng những trải nghiệm giao diện mượt mà và thân thiện. 
+                    Luôn học hỏi công nghệ mới, biến ý tưởng thành sản phẩm trực quan.
+                </div>
+                <div class="quote">
+                    <i class="fas fa-quote-left" style="margin-right: 8px; color:#6c8fb0;"></i> "Thiết kế không chỉ là vẻ ngoài, mà còn là cách nó vận hành."
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin chi tiết dạng grid (giới thiệu bản thân sâu hơn) -->
+        <div class="info-grid">
+            <!-- Thông tin cơ bản -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-id-card"></i> 
+                    <span>Thông tin</span>
+                </div>
+                <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                    <div><i class="fas fa-calendar-alt" style="width: 24px; color:#4b6f9e;"></i> 22 tuổi · 10/09/2002</div>
+                    <div><i class="fas fa-graduation-cap" style="width: 24px; color:#4b6f9e;"></i> CNTT - Đại học Bách Khoa Hà Nội</div>
+                    <div><i class="fas fa-briefcase" style="width: 24px; color:#4b6f9e;"></i> 2+ năm kinh nghiệm (Freelance & Intern)</div>
+                    <div><i class="fas fa-language" style="width: 24px; color:#4b6f9e;"></i> Tiếng Việt (bản xứ), IELTS 7.0</div>
+                </div>
+            </div>
+
+            <!-- Kỹ năng chuyên môn -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-cogs"></i>
+                    <span>Kỹ năng</span>
+                </div>
+                <div class="skill-list">
+                    <span class="skill-tag">HTML5 / CSS3</span>
+                    <span class="skill-tag">JavaScript (ES6+)</span>
+                    <span class="skill-tag">React.js</span>
+                    <span class="skill-tag">Tailwind / Bootstrap</span>
+                    <span class="skill-tag">Git & Github</span>
+                    <span class="skill-tag">Figma cơ bản</span>
+                    <span class="skill-tag">Responsive Design</span>
+                    <span class="skill-tag">Node.js (Express)</span>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.85rem; color: #2c6280;">
+                    <i class="fas fa-trophy"></i> Chứng chỉ: FreeCodeCamp Responsive Web Design, Google UX Design (cơ bản)
+                </div>
+            </div>
+
+            <!-- Sở thích / đam mê -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-heart"></i>
+                    <span>Sở thích</span>
+                </div>
+                <div class="hobby-item">
+                    <i class="fas fa-camera-retro"></i> <span>Chụp ảnh & chỉnh màu</span>
+                </div>
+                <div class="hobby-item">
+                    <i class="fas fa-robot"></i> <span>Khám phá AI & công cụ mới</span>
+                </div>
+                <div class="hobby-item">
+                    <i class="fas fa-book-open"></i> <span>Đọc sách (Khoa học, tiểu thuyết)</span>
+                </div>
+                <div class="hobby-item">
+                    <i class="fas fa-gamepad"></i> <span>Indie game & puzzle</span>
+                </div>
+                <div class="hobby-item">
+                    <i class="fas fa-mug-hot"></i> <span>Pha cà phê phin mỗi sáng</span>
+                </div>
+            </div>
+
+            <!-- Dự án nổi bật / thành tựu -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-star"></i>
+                    <span>Dự án tiêu biểu</span>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-weight: 600;"><i class="fas fa-globe"></i> WeatherVibe</div>
+                    <div style="font-size: 0.8rem; color:#475569;">Ứng dụng thời tiết với API, giao diện động, dark mode.</div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-weight: 600;"><i class="fas fa-store"></i> ShopCOSY</div>
+                    <div style="font-size: 0.8rem; color:#475569;">Website bán hàng mini, tích hợp giỏ hàng và thanh toán giả lập.</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600;"><i class="fas fa-chalkboard-user"></i> Portfolio AI</div>
+                    <div style="font-size: 0.8rem; color:#475569;">Trang giới thiệu cá nhân với hiệu ứng 3D nhẹ (Three.js).</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liên hệ & mạng xã hội -->
+        <div style="display: flex; flex-wrap: wrap; gap: 1.8rem; justify-content: space-between; margin-top: 1rem;">
+            <div style="flex: 1; min-width: 200px;">
+                <div class="card-title" style="margin-bottom: 1rem;">
+                    <i class="fas fa-envelope"></i> Liên hệ
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i> <span>minhduc.nguyen@example.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone-alt"></i> <span>+84 912 345 678</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-github"></i> <span>github.com/minhduc-dev</span>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i> Instagram</a>
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <div class="card-title" style="margin-bottom: 1rem;">
+                    <i class="fas fa-clock"></i> Lịch trình & Cam kết
+                </div>
+                <div style="background:#f9fbfe; border-radius: 1rem; padding: 0.8rem;">
+                    <p style="font-size: 0.85rem;"><i class="fas fa-check-circle" style="color:#2e7d32;"></i> Sẵn sàng nhận dự án freelance</p>
+                    <p style="font-size: 0.85rem; margin-top: 0.6rem;"><i class="fas fa-chalkboard"></i> Mentor lập trình cơ bản cho người mới</p>
+                    <p style="font-size: 0.85rem; margin-top: 0.6rem;"><i class="fas fa-lightbulb"></i> Luôn cập nhật xu hướng front-end</p>
+                </div>
+                <div style="margin-top: 1.2rem; background:#eef3fc; border-radius: 1rem; padding: 0.6rem 1rem;">
+                    <i class="fas fa-map-pin"></i> <strong>Open to work:</strong> Remote / Hybrid · Internship & Junior
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer nhẹ nhàng -->
+        <footer>
+            <span><i class="far fa-copyright"></i> 2025 Minh Đức - Trang giới thiệu cá nhân</span>
+            <span><i class="fas fa-code-branch"></i> Phiên bản 2.0 | Thiết kế tối giản nhưng tinh tế</span>
+            <span><i class="fas fa-smile-wink"></i> Cảm ơn bạn đã ghé thăm!</span>
+        </footer>
+    </div>
+</div>
+
+<!-- Một chút JavaScript tương tác nhỏ (không bắt buộc, tạo hiệu ứng thú vị) -->
+<script>
+    (function() {
+        // Thêm hiệu ứng console greeting vui nhộn (dấu hiệu "trình duyệt" developer friendly)
+        console.log("%c✨ Chào mừng đến với trang giới thiệu của Minh Đức! ✨", "color: #2c6e9e; font-size: 14px; font-weight: bold;");
+        console.log("%c🔍 Bạn có thể xem thông tin chi tiết hoặc liên hệ qua email trong trang.", "color: #4b6f9e; font-size: 12px;");
+
+        // Một hiệu ứng nhẹ: khi di chuột vào skill tag thì thay đổi màu nhẹ (optional)
+        const tags = document.querySelectorAll('.skill-tag');
+        tags.forEach(tag => {
+            tag.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.backgroundColor = '#dfe9ff';
+            });
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.backgroundColor = '#eef2ff';
+            });
+        });
+
+        // Tạo 1 thông báo nhỏ dạng "Tooltip" friendly cho các social links (hiển thị alert nhẹ - không làm phiền)
+        const socialLinks = document.querySelectorAll('.social-link');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('🔗 Đây là liên kết mạng xã hội giới thiệu. Bạn có thể cập nhật link thật của mình!');
+            });
+        });
+
+        // Thêm hiệu ứng nhẹ cho thanh URL giả (chỉ vui thôi)
+        const urlTextSpan = document.querySelector('.url-text');
+        if(urlTextSpan) {
+            urlTextSpan.addEventListener('dblclick', () => {
+                alert('📋 Đây chỉ là URL demo - Trang giới thiệu bản thân trong "trình duyệt" giả lập.');
+            });
+        }
+    })();
+</script>
+</body>
+</html>
