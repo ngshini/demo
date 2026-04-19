@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mô hình Chứng khoán | Dashboard theo dõi cổ phiếu</title>
+    <!-- Google Fonts + Chart.js + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b1120;
+            font-family: 'Inter', sans-serif;
+            color: #eef2ff;
+            padding: 1.5rem;
+        }
+
+        /* container chính */
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .market-status {
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .market-status i {
+            color: #10b981;
+            margin-right: 6px;
+        }
+
+        .refresh-btn {
+            background: #1e293b;
+            border: none;
+            color: #a5f3fc;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .refresh-btn:hover {
+            background: #2d3a5e;
+            transform: scale(0.97);
+            color: white;
+        }
+
+        /* grid chính */
+        .grid-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #111827;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.2rem;
+            border: 1px solid #1f2a3e;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        /* bảng và biểu đồ */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .stock-table-section, .chart-section {
+            background: #111827;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1rem;
+            border: 1px solid #1f2a3e;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 0.8rem;
+        }
+
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stock-table th, .stock-table td {
+            text-align: left;
+            padding: 0.9rem 0.5rem;
+            border-bottom: 1px solid #1f2a3e;
+        }
+
+        .stock-table th {
+            color: #9ca3af;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .stock-symbol {
+            font-weight: 700;
+            color: #cbd5e1;
+        }
+
+        .change-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 65px;
+        }
+
+        .change-up {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .change-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* chart container */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            margin-top: 0.5rem;
+        }
+
+        canvas {
+            max-height: 100%;
+            width: 100%;
+        }
+
+        /* tin tức mô phỏng */
+        .news-ticker {
+            background: #0f172a;
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            margin-top: 0.8rem;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .news-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #7e8b9e;
+        }
+
+        .news-item {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 850px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #4b5563;
+        }
+
+        button {
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="header">
+        <div class="title">
+            <h1><i class="fas fa-chart-line"></i> Mô hình chứng khoán · VN30</h1>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="market-status">
+                <i class="fas fa-circle"></i> Thị trường: Đang mở cửa
+            </div>
+            <button class="refresh-btn" id="refreshDataBtn">
+                <i class="fas fa-sync-alt"></i> Cập nhật dữ liệu
+            </button>
+        </div>
+    </div>
+
+    <!-- Các chỉ số thị trường vĩ mô -->
+    <div class="grid-overview" id="indicesContainer">
+        <div class="stat-card">
+            <div class="stat-title">VN-INDEX</div>
+            <div class="stat-value" id="vnIndexVal">1,285.42</div>
+            <div class="stat-change" id="vnIndexChange"><i class="fas fa-arrow-up"></i> +8.24 (+0.64%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">HNX-INDEX</div>
+            <div class="stat-value" id="hnxIndexVal">235.18</div>
+            <div class="stat-change" id="hnxIndexChange"><i class="fas fa-arrow-up"></i> +1.52 (+0.65%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">UPCOM-INDEX</div>
+            <div class="stat-value" id="upcomVal">92.37</div>
+            <div class="stat-change" id="upcomChange"><i class="fas fa-arrow-down"></i> -0.28 (-0.30%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">KLGD (triệu cp)</div>
+            <div class="stat-value" id="volumeVal">687.5</div>
+            <div class="stat-change"><i class="fas fa-chart-simple"></i> +12% so với hôm qua</div>
+        </div>
+    </div>
+
+    <!-- Bảng cổ phiếu + biểu đồ -->
+    <div class="two-columns">
+        <!-- Bảng giá cổ phiếu -->
+        <div class="stock-table-section">
+            <div class="section-title">
+                <i class="fas fa-table-list"></i> Danh sách cổ phiếu VN30
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="stock-table" id="stockTable">
+                    <thead>
+                        <tr><th>Mã</th><th>Giá (1k VND)</th><th>+/-</th><th>% thay đổi</th></tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <!-- JS sẽ fill dữ liệu mẫu -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="news-ticker">
+                <div class="news-title"><i class="fas fa-newspaper"></i> Tin nhanh thị trường</div>
+                <div class="news-item"><i class="fas fa-chart-line" style="color:#3b82f6"></i> VN30 hồi phục nhờ cổ phiếu ngân hàng, VCB tăng 1.8%</div>
+                <div class="news-item"><i class="fas fa-dollar-sign" style="color:#f59e0b"></i> Khối ngoại mua ròng 320 tỷ đồng trên toàn thị trường</div>
+                <div class="news-item"><i class="fas fa-industry"></i> Cổ phiếu bất động sản diễn biến phân hóa, VIC đứng giá tham chiếu</div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ giá mô phỏng chỉ số VNIndex trong ngày -->
+        <div class="chart-section">
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i> Biểu đồ VN-INDEX (giả lập 30 phiên gần nhất)
+            </div>
+            <div class="chart-container">
+                <canvas id="vnIndexChart" width="400" height="250" style="max-width:100%; height:auto;"></canvas>
+            </div>
+            <div class="news-ticker" style="margin-top: 1rem;">
+                <div class="news-item"><i class="fas fa-lightbulb"></i> Mô hình mô phỏng: Dữ liệu biểu đồ & bảng giá được cập nhật ngẫu nhiên trong biên độ ±1.5% khi nhấn nút "Cập nhật".</div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <i class="fas fa-chart-simple"></i> Dữ liệu mang tính mô phỏng, phục vụ mô hình chứng khoán minh họa. | Bấm "Cập nhật" để thay đổi giá và biểu đồ.
+    </footer>
+</div>
+
+<script>
+    // --- Dữ liệu mẫu cổ phiếu ban đầu (giá, thay đổi) ---
+    let stocksData = [
+        { symbol: "VCB", price: 92.5, change: 1.2, changePercent: 1.31 },
+        { symbol: "HPG", price: 28.45, change: -0.15, changePercent: -0.52 },
+        { symbol: "VNM", price: 74.2, change: 0.8, changePercent: 1.09 },
+        { symbol: "VIC", price: 45.6, change: 0.0, changePercent: 0.00 },
+        { symbol: "TCB", price: 49.35, change: 0.95, changePercent: 1.96 },
+        { symbol: "MWG", price: 62.8, change: -1.2, changePercent: -1.88 },
+        { symbol: "FPT", price: 118.5, change: 2.3, changePercent: 1.98 },
+        { symbol: "SSI", price: 36.2, change: -0.4, changePercent: -1.09 }
+    ];
+
+    // chỉ số thị trường
+    let marketIndices = {
+        vnIndex: 1285.42,
+        hnxIndex: 235.18,
+        upcom: 92.37,
+        volume: 687.5
+    };
+
+    // Dữ liệu cho biểu đồ (30 điểm giả lập dựa trên chỉ số VNIndex)
+    let chartDataPoints = [];
+
+    // Hàm khởi tạo biểu đồ đường
+    let stockChart = null;
+    function initChart() {
+        const ctx = document.getElementById('vnIndexChart').getContext('2d');
+        if (stockChart) stockChart.destroy();
+        // sinh 30 giá trị dựa trên vnIndex hiện tại +/- nhiễu
+        generateChartDataFromIndex(marketIndices.vnIndex);
+        stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => `T-${29-i}`),
+                datasets: [{
+                    label: 'VN-Index (điểm)',
+                    data: chartDataPoints,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    borderWidth: 2.5,
+                    pointRadius: 1.5,
+                    pointBackgroundColor: '#60a5fa',
+                    tension: 0.3,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: { mode: 'index', intersect: false },
+                    legend: { labels: { color: '#cbd5e1' } }
+                },
+                scales: {
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', maxRotation: 45, autoSkip: true } }
+                }
+            }
+        });
+    }
+
+    // Tạo dữ liệu biểu đồ mô phỏng quanh giá index hiện tại
+    function generateChartDataFromIndex(currentIndex) {
+        const points = [];
+        let base = currentIndex - 8 + (Math.random() * 16); // xu hướng ngẫu nhiên
+        for (let i = 0; i < 30; i++) {
+            let noise = (Math.random() - 0.5) * 3.8;
+            let trend = Math.sin(i * 0.25) * 4; // sóng nhẹ
+            let val = base + trend + noise;
+            val = Math.max(850, val);
+            points.push(parseFloat(val.toFixed(2)));
+            base = val;
+        }
+        chartDataPoints = points;
+    }
+
+    // Cập nhật bảng cổ phiếu dựa vào stocksData
+    function renderStockTable() {
+        const tbody = document.getElementById('stockTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        stocksData.forEach(stock => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = `<span class="stock-symbol">${stock.symbol}</span>`;
+            row.insertCell(1).innerHTML = stock.price.toFixed(2);
+            const changeVal = stock.change;
+            const changePercentVal = stock.changePercent;
+            const isPositive = changeVal >= 0;
+            const changeHtml = `<span class="${isPositive ? 'positive' : 'negative'}">${isPositive ? '+' : ''}${changeVal.toFixed(2)}</span>`;
+            row.insertCell(2).innerHTML = changeHtml;
+            const badgeClass = changePercentVal >= 0 ? 'change-up' : 'change-down';
+            const percentSign = changePercentVal >= 0 ? '+' : '';
+            row.insertCell(3).innerHTML = `<span class="change-badge ${badgeClass}">${percentSign}${changePercentVal.toFixed(2)}%</span>`;
+        });
+    }
+
+    // Cập nhật các chỉ số thị trường trên giao diện
+    function updateMarketIndicesUI() {
+        document.getElementById('vnIndexVal').innerText = marketIndices.vnIndex.toFixed(2);
+        document.getElementById('hnxIndexVal').innerText = marketIndices.hnxIndex.toFixed(2);
+        document.getElementById('upcomVal').innerText = marketIndices.upcom.toFixed(2);
+        document.getElementById('volumeVal').innerText = marketIndices.volume.toFixed(1);
+        
+        // cập nhật change text (giả định tính delta so với trước đó, mô phỏng động)
+        const vnChange = ((marketIndices.vnIndex - 1285.42) / 1285.42 * 100).toFixed(2);
+        const vnChangeVal = (marketIndices.vnIndex - 1285.42).toFixed(2);
+        const vnIcon = vnChangeVal >= 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+        document.getElementById('vnIndexChange').innerHTML = `${vnIcon} ${vnChangeVal >=0 ? '+' : ''}${vnChangeVal} (${vnChange>=0?'+':''}${vnChange}%)`;
+        
+        const hnxChange = ((marketIndices.hnxIndex - 235.18) / 235.18 * 100).toFixed(2);
+        const hnxChangeVal = (marketIndices.hnxIndex - 235.18).toFixed(2);
+        const hnxIcon = hnxChangeVal >= 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+        document.getElementById('hnxIndexChange').innerHTML = `${hnxIcon} ${hnxChangeVal >=0 ? '+' : ''}${hnxChangeVal} (${hnxChange>=0?'+':''}${hnxChange}%)`;
+        
+        const upChange = ((marketIndices.upcom - 92.37) / 92.37 * 100).toFixed(2);
+        const upChangeVal = (marketIndices.upcom - 92.37).toFixed(2);
+        const upIcon = upChangeVal >= 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+        document.getElementById('upcomChange').innerHTML = `${upIcon} ${upChangeVal >=0 ? '+' : ''}${upChangeVal} (${upChange>=0?'+':''}${upChange}%)`;
+    }
+
+    // Hàm random trong khoảng ± biên độ cho giá và các chỉ số
+    function randomRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    // Cập nhật toàn bộ dữ liệu (mô phỏng thay đổi giá chứng khoán)
+    function refreshMarketData() {
+        // 1. Cập nhật chỉ số thị trường: thay đổi ngẫu nhiên trong khoảng -0.8% đến +0.9%
+        const vnOld = marketIndices.vnIndex;
+        let vnNew = vnOld * (1 + (randomRange(-0.008, 0.0095)));
+        vnNew = parseFloat(vnNew.toFixed(2));
+        marketIndices.vnIndex = vnNew;
+        
+        let hnxNew = marketIndices.hnxIndex * (1 + (randomRange(-0.007, 0.01)));
+        marketIndices.hnxIndex = parseFloat(hnxNew.toFixed(2));
+        
+        let upNew = marketIndices.upcom * (1 + (randomRange(-0.009, 0.008)));
+        marketIndices.upcom = parseFloat(upNew.toFixed(2));
+        
+        let volNew = marketIndices.volume + randomRange(-18, 32);
+        volNew = Math.max(450, volNew);
+        marketIndices.volume = parseFloat(volNew.toFixed(1));
+        
+        // 2. Cập nhật giá cổ phiếu với biến động ±1.2% đến ±2% (ngẫu nhiên)
+        stocksData = stocksData.map(stock => {
+            let changePercentRaw = randomRange(-1.9, 2.1);
+            let newPrice = stock.price * (1 + changePercentRaw / 100);
+            newPrice = parseFloat(newPrice.toFixed(2));
+            let actualChange = newPrice - stock.price;
+            let actualPercent = (actualChange / stock.price) * 100;
+            return {
+                ...stock,
+                price: newPrice,
+                change: parseFloat(actualChange.toFixed(2)),
+                changePercent: parseFloat(actualPercent.toFixed(2))
+            };
+        });
+        
+        // cập nhật giao diện bảng + chỉ số
+        renderStockTable();
+        updateMarketIndicesUI();
+        
+        // 3. Cập nhật biểu đồ dựa trên VNIndex mới (tạo dữ liệu giả lập lại 30 phiên)
+        generateChartDataFromIndex(marketIndices.vnIndex);
+        if (stockChart) {
+            stockChart.data.datasets[0].data = chartDataPoints;
+            stockChart.update();
+        } else {
+            initChart();
+        }
+        
+        // 4. Thay đổi nội dung tin nhanh random cho vui (tạo cảm giác động)
+        const newsContainer = document.querySelector('.news-ticker');
+        if (newsContainer) {
+            const newsItems = [
+                `<i class="fas fa-chart-line" style="color:#3b82f6"></i> Khối ngoại giao dịch sôi động, tập trung vào VCB và HPG.`,
+                `<i class="fas fa-dollar-sign" style="color:#f59e0b"></i> Tỷ giá trung tâm ổn định, hỗ trợ tâm lý nhà đầu tư.`,
+                `<i class="fas fa-industry"></i> Nhóm cổ phiếu thép điều chỉnh sau nhịp tăng nóng.`,
+                `<i class="fas fa-chart-simple"></i> Dòng tiền có dấu hiệu quay lại nhóm midcap.`
+            ];
+            const randomNews = newsItems[Math.floor(Math.random() * newsItems.length)];
+            const firstNewsDiv = newsContainer.querySelector('.news-item');
+            if (firstNewsDiv) {
+                firstNewsDiv.innerHTML = randomNews;
+            }
+        }
+    }
+
+    // Hàm khởi tạo lần đầu
+    function init() {
+        renderStockTable();
+        // đồng bộ chỉ số thị trường ban đầu
+        updateMarketIndicesUI();
+        initChart();
+        
+        // Gắn sự kiện cho nút refresh
+        const refreshBtn = document.getElementById('refreshDataBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                refreshMarketData();
+                // thêm hiệu ứng nhẹ khi bấm nút (tuỳ chọn)
+                refreshBtn.style.transform = 'scale(0.96)';
+                setTimeout(() => { refreshBtn.style.transform = ''; }, 150);
+            });
+        }
+        
+        // Tự động cập nhật mỗi 20 giây (mô phỏng thời gian thực)
+        setInterval(() => {
+            refreshMarketData();
+        }, 20000);
+    }
+    
+    init();
+</script>
+</body>
+</html>
